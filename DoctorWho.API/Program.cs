@@ -25,6 +25,8 @@ builder.Services.AddScoped<IDoctorRepository, DoctorRepository>();
 
 builder.Services.AddScoped<IEpisodeRepository, EpisodeRepository>();
 
+builder.Services.AddScoped<IEnemyRepository, EnemyRepository>();
+
 builder.Services.AddSingleton<ISchema, DoctorWhoSchema>
     (services => new DoctorWhoSchema(new SelfActivatingServiceProvider(services)));
 
