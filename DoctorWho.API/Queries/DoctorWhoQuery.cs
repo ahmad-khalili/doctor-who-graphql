@@ -14,20 +14,15 @@ public sealed class DoctorWhoQuery : ObjectGraphType
             new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "pageNumber", DefaultValue = 1 },
             new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "pageSize", DefaultValue = 3 }
         };
-        
-        Field<ListGraphType<DoctorType>>("doctors",
-            arguments: new QueryArguments
+
+        Field<ListGraphType<DoctorType>>("doctors").Arguments(defaultQueryArguments)
+            .ResolveAsync(async context =>
             {
-                new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "pageNumber", DefaultValue = 1},
-                new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "pageSize", DefaultValue = 3}
-            },
-            resolve: context =>
-            {
-                var pageNumber = context.GetArgument<int>("pageNumber");
-                var pageSize = context.GetArgument<int>("pageSize");
-                var repository = context.RequestServices.GetRequiredService<IDoctorRepository>();
+                var repository = context.RequestServices!.GetRequiredService<IDoctorRepository>();
+                var pageNumber = await context.GetValidatedArgumentAsync<int>("pageNumber");
+                var pageSize = await context.GetValidatedArgumentAsync<int>("pageSize");
                 
-                return repository.GetDoctors(pageNumber, pageSize);
+                return await repository.GetDoctorsAsync(pageNumber, pageSize);
             });
 
         Field<ListGraphType<EpisodeType>>("episodes").Arguments(defaultQueryArguments)
