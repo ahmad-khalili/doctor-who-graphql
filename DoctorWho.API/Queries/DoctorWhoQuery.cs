@@ -1,8 +1,6 @@
 ﻿using DoctorWho.API.Types;
-using DoctorWho.Db;
 using DoctorWho.Db.Repositories;
 using GraphQL;
-using GraphQL.Execution;
 using GraphQL.Types;
 
 namespace DoctorWho.API.Queries;
@@ -14,8 +12,8 @@ public sealed class DoctorWhoQuery : ObjectGraphType
         Field<ListGraphType<DoctorType>>("doctors",
             arguments: new QueryArguments
             {
-                new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "pageNumber" },
-                new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "pageSize" }
+                new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "pageNumber", DefaultValue = 1},
+                new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "pageSize", DefaultValue = 3}
             },
             resolve: context =>
             {
