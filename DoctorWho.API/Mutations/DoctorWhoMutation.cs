@@ -101,5 +101,29 @@ public sealed class DoctorWhoMutation : ObjectGraphType
 
                 return companion;
             });
+
+        var updateAuthorArguments = new QueryArguments
+        {
+            new QueryArgument<NonNullGraphType<IntGraphType>> {Name = "authorId"},
+            new QueryArgument<AuthorInputType> {Name = "author"}
+        };
+
+        Field<AuthorType>("updateAuthor").Arguments(updateAuthorArguments)
+            .ResolveAsync(async context =>
+            {
+                var repository = context.RequestServices!.GetRequiredService<IAuthorRepository>();
+                var authorId = await context.GetValidatedArgumentAsync<int>("authorId");
+
+                if (!await repository.AuthorExistsAsync(authorId))
+                    throw new ExecutionError($"Author with ID {authorId} not found");
+
+                var author = await context.GetValidatedArgumentAsync<Author>("author");
+
+                var updatedAuthor = await repository.UpdateAuthorAsync(authorId, author);
+
+                await repository.SaveChangesAsync();
+
+                return updatedAuthor;
+            });
     }
 }
