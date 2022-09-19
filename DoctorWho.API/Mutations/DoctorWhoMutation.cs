@@ -77,5 +77,29 @@ public sealed class DoctorWhoMutation : ObjectGraphType
 
                 return enemy;
             });
+        
+        var addCompanionArguments = new QueryArguments
+        {
+            new QueryArgument<NonNullGraphType<IntGraphType>> {Name = "episodeId"},
+            new QueryArgument<CompanionInputType> {Name = "companion"}
+        };
+
+        Field<CompanionType>("addCompanionToEpisode").Arguments(addCompanionArguments)
+            .ResolveAsync(async context =>
+            {
+                var repository = context.RequestServices!.GetRequiredService<ICompanionRepository>();
+                var episodeId = await context.GetValidatedArgumentAsync<int>("episodeId");
+
+                if (!await repository.EpisodeExistsAsync(episodeId))
+                    throw new ExecutionError($"Episode with ID {episodeId} not found");
+
+                var companion = await context.GetValidatedArgumentAsync<Companion>("companion");
+
+                await repository.AddCompanionToEpisodeAsync(episodeId, companion);
+
+                await repository.SaveChangesAsync();
+
+                return companion;
+            });
     }
 }
