@@ -8,6 +8,7 @@
 
     <ItemGroup>
         <PackageReference Include="GraphQL" Version="7.1.0" />
+        <PackageReference Include="GraphQL.FluentValidation" Version="8.0.0" />
         <PackageReference Include="GraphQL.MicrosoftDI" Version="7.1.0" />
         <PackageReference Include="GraphQL.Server.Authorization.AspNetCore" Version="7.1.1" />
         <PackageReference Include="GraphQL.Server.Ui.Altair" Version="7.1.1" />
