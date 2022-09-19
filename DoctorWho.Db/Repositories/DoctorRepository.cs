@@ -21,4 +21,33 @@ public class DoctorRepository : IDoctorRepository
 
         return collectionToReturn;
     }
+
+    private async Task<int> GetDoctorIdAsync(Doctor doctor)
+    {
+        var queriedDoctor = await _context.Doctors
+            .FirstOrDefaultAsync(d => d.DoctorNumber.Equals(doctor.DoctorNumber));
+        
+        if (queriedDoctor == default)
+            throw new Exception("Doctor not found!");
+
+        return queriedDoctor.DoctorId;
+    }
+
+    public async Task<int> UpsertDoctorAsync(Doctor doctor)
+    {
+        await _context.Doctors.Upsert(doctor)
+            .On(d => d.DoctorNumber)
+            .WhenMatched(d => new Doctor
+            {
+                DoctorName = doctor.DoctorName,
+                DoctorNumber = doctor.DoctorNumber,
+                BirthDate = doctor.BirthDate,
+                FirstEpisodeDate = doctor.FirstEpisodeDate,
+                LastEpisodeDate = doctor.LastEpisodeDate,
+            }).RunAsync();
+        
+        var doctorId = await GetDoctorIdAsync(doctor);
+
+        return doctorId;
+    }
 }

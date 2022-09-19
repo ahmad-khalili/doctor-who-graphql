@@ -2,6 +2,7 @@ using DoctorWho.API.Schemas;
 using DoctorWho.Db;
 using DoctorWho.Db.Repositories;
 using GraphQL;
+using GraphQL.FluentValidation;
 using GraphQL.MicrosoftDI;
 using GraphQL.Types;
 using Microsoft.EntityFrameworkCore;
@@ -25,9 +26,13 @@ builder.Services.AddScoped<IDoctorRepository, DoctorRepository>();
 builder.Services.AddSingleton<ISchema, DoctorWhoSchema>
     (services => new DoctorWhoSchema(new SelfActivatingServiceProvider(services)));
 
+var validatorCache = new ValidatorInstanceCache();
+validatorCache.AddValidatorsFromAssembly(AppDomain.CurrentDomain.GetAssemblies()[1]);
+
 builder.Services.AddGraphQL(options => options.ConfigureExecution((opt, next) =>
     {
         opt.EnableMetrics = true;
+        opt.UseFluentValidation(validatorCache);
         return next(opt);
     }).AddSystemTextJson()
 );
