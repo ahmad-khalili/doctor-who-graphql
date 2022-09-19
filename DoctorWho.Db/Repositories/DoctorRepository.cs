@@ -12,12 +12,12 @@ public class DoctorRepository : IDoctorRepository
         _context = context ?? throw new ArgumentNullException(nameof(context));
     }
 
-    public IEnumerable<Doctor> GetDoctors(int pageNumber, int pageSize)
+    public async Task<IEnumerable<Doctor>> GetDoctorsAsync(int pageNumber, int pageSize)
     {
         var collection = _context.Doctors as IQueryable<Doctor>;
         
-        var collectionToReturn =  collection.OrderBy(d => d.DoctorName)
-            .Skip(pageSize * (pageNumber - 1)).Take(pageSize).ToList();
+        var collectionToReturn =  await collection.OrderBy(d => d.DoctorName)
+            .Skip(pageSize * (pageNumber - 1)).Take(pageSize).ToListAsync();
 
         return collectionToReturn;
     }
