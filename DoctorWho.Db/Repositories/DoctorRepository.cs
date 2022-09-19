@@ -50,4 +50,19 @@ public class DoctorRepository : IDoctorRepository
 
         return doctorId;
     }
+
+    public async Task<Doctor?> GetDoctorAsync(int doctorId)
+    {
+        return await _context.Doctors.FirstOrDefaultAsync(d => d.DoctorId.Equals(doctorId));
+    }
+
+    public void DeleteDoctor(Doctor doctor)
+    {
+        _context.Doctors.Remove(doctor);
+    }
+
+    public async Task<bool> SaveChangesAsync()
+    {
+        return await _context.SaveChangesAsync() >= 0;
+    }
 }
