@@ -36,5 +36,22 @@ public sealed class DoctorWhoMutation : ObjectGraphType
 
                 return doctorEntity;
             });
+
+        Field<EpisodeType>("createEpisode").Argument<EpisodeInputType>("episode")
+            .ResolveAsync(async context =>
+            {
+                var repository = context.RequestServices!.GetRequiredService<IEpisodeRepository>();
+                var episodeToAdd = await context.GetValidatedArgumentAsync<Episode>("episode");
+                
+                if (!await repository.AuthorExistsAsync(episodeToAdd.AuthorId) ||
+                    !await repository.DoctorExistsAsync(episodeToAdd.DoctorId))
+                    throw new ExecutionError("Doctor or Author IDs don't exist");
+
+                await repository.AddEpisodeAsync(episodeToAdd);
+
+                await repository.SaveChangesAsync();
+
+                return episodeToAdd;
+            });
     }
 }
