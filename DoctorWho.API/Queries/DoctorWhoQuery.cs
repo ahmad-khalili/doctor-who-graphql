@@ -7,9 +7,9 @@ using GraphQL.Types;
 
 namespace DoctorWho.API.Queries;
 
-public sealed class DoctorQuery : ObjectGraphType
+public sealed class DoctorWhoQuery : ObjectGraphType
 {
-    public DoctorQuery()
+    public DoctorWhoQuery()
     {
         Field<ListGraphType<DoctorType>>("doctors",
             arguments: new QueryArguments
