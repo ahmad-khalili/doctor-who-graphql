@@ -1,5 +1,4 @@
 ﻿using DoctorWho.Db.Entities;
-using DoctorWho.Db.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace DoctorWho.Db;
@@ -15,9 +14,6 @@ public class DoctorWhoCoreDbContext : DbContext
     public DbSet<Episode> Episodes { get; set; } = null!;
     public DbSet<EpisodeEnemy> EpisodeEnemies { get; set; } = null!;
     public DbSet<EpisodeCompanion> EpisodeCompanions { get; set; } = null!;
-    public DbSet<EpisodeWithInfo> EpisodesWithInfo { get; set; } = null!;
-    public DbSet<EpisodeSummaryCompanion> EpisodeSummariesCompanions { get; set; } = null!;
-    public DbSet<EpisodeSummaryEnemy> EpisodeSummariesEnemies { get; set; } = null!;
 
     public string GetCompanions(int episodeId) => throw new NotSupportedException();
     public string GetEnemies(int episodeId) => throw new NotSupportedException();

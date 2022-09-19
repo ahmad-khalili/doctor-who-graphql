@@ -1,5 +1,9 @@
+using DoctorWho.API.Schemas;
 using DoctorWho.Db;
 using DoctorWho.Db.Repositories;
+using GraphQL;
+using GraphQL.MicrosoftDI;
+using GraphQL.Types;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,13 +22,15 @@ builder.Services.AddDbContext<DoctorWhoCoreDbContext>(options =>
 
 builder.Services.AddScoped<IDoctorRepository, DoctorRepository>();
 
-builder.Services.AddScoped<IEpisodeRepository, EpisodeRepository>();
+builder.Services.AddSingleton<ISchema, DoctorWhoSchema>
+    (services => new DoctorWhoSchema(new SelfActivatingServiceProvider(services)));
 
-builder.Services.AddScoped<IEnemyRepository, EnemyRepository>();
-
-builder.Services.AddScoped<ICompanionRepository, CompanionRepository>();
-
-builder.Services.AddScoped<IAuthorRepository, AuthorRepository>();
+builder.Services.AddGraphQL(options => options.ConfigureExecution((opt, next) =>
+    {
+        opt.EnableMetrics = true;
+        return next(opt);
+    }).AddSystemTextJson()
+);
 
 var app = builder.Build();
 
@@ -33,6 +39,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseGraphQLAltair();
 }
 
 app.UseHttpsRedirection();
@@ -40,5 +47,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseGraphQL();
 
 app.Run();
