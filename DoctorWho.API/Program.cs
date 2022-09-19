@@ -23,6 +23,8 @@ builder.Services.AddDbContext<DoctorWhoCoreDbContext>(options =>
 
 builder.Services.AddScoped<IDoctorRepository, DoctorRepository>();
 
+builder.Services.AddScoped<IEpisodeRepository, EpisodeRepository>();
+
 builder.Services.AddSingleton<ISchema, DoctorWhoSchema>
     (services => new DoctorWhoSchema(new SelfActivatingServiceProvider(services)));
 
