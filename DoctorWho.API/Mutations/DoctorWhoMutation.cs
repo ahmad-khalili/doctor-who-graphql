@@ -13,11 +13,28 @@ public sealed class DoctorWhoMutation : ObjectGraphType
         Field<DoctorType>("upsertDoctor").Argument<DoctorInputType>("doctor")
             .ResolveAsync(async context =>
             {
-                var repository = context.RequestServices.GetRequiredService<IDoctorRepository>();
+                var repository = context.RequestServices!.GetRequiredService<IDoctorRepository>();
                 var doctorToAdd = await context.GetValidatedArgumentAsync<Doctor>("doctor");
                 var addedDoctorId = await repository.UpsertDoctorAsync(doctorToAdd);
                 doctorToAdd.DoctorId = addedDoctorId;
                 return doctorToAdd;
+            });
+
+        Field<DoctorType>("deleteDoctor").Argument<IntGraphType>("id")
+            .ResolveAsync(async context =>
+            {
+                var repository = context.RequestServices!.GetRequiredService<IDoctorRepository>();
+                var doctorId = await context.GetValidatedArgumentAsync<int>("id");
+                var doctorEntity = await repository.GetDoctorAsync(doctorId);
+
+                if (doctorEntity == default)
+                    throw new ExecutionError($"Doctor with id {doctorId} not found");
+
+                repository.DeleteDoctor(doctorEntity);
+
+                await repository.SaveChangesAsync();
+
+                return doctorEntity;
             });
     }
 }
